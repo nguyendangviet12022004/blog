@@ -10,7 +10,16 @@ services:
       - blog-data:/var/lib/mysql
     networks:
       - blog-network
-
+  api:
+    container_name: blog-api
+    build: blog-api
+    env_file:
+      - api.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    
 
 volumes:
   blog-data:
