@@ -1,4 +1,5 @@
 package com.viet.blog_api.entity;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -15,15 +16,25 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
 @Builder
 public class Account implements UserDetails {
     @Id
     private String email;
 
     private String password;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String avatarUrl;
 
     @CreatedDate
     private LocalDateTime createdDate;
@@ -38,7 +49,8 @@ public class Account implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities.stream().map(auth -> new SimpleGrantedAuthority(auth.getAuthorityName().toString())).toList();
+        return this.authorities.stream().map(auth -> new SimpleGrantedAuthority(auth.getAuthorityName().toString()))
+                .toList();
     }
 
     @Override
