@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import lombok.Builder;
@@ -25,7 +27,11 @@ import lombok.Setter;
 @Setter
 @Builder
 public class Account implements UserDetails {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     private String email;
 
     private String password;
@@ -46,6 +52,10 @@ public class Account implements UserDetails {
     private List<Authority> authorities;
 
     private boolean enabled;
+
+    public List<Authority> getAuthorityEntities() {
+        return authorities;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
