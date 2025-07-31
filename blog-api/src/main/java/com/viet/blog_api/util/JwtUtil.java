@@ -1,16 +1,23 @@
 package com.viet.blog_api.util;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 @Service
@@ -54,6 +61,35 @@ public class JwtUtil {
 
     public String generateRefreshToken(Authentication auth) {
         return generateToken(auth, jwtRefreshExpiration);
+    }
+
+    private JwtParser getParse() {
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build();
+    }
+
+    private Claims extractClaims(String token) {
+        return getParse().parseSignedClaims(token).getPayload();
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = extractClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private String extractSubject(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    private List<GrantedAuthority> extractAuthorities(String token) {
+        String authoritiesStr = extractClaim(token, (claim) -> claim.get("authorities", String.class));
+        return AuthorityUtils.commaSeparatedStringToAuthorityList(authoritiesStr);
+    }
+
+    public Authentication extractAuthentication(String accessToken) {
+        return new UsernamePasswordAuthenticationToken(extractSubject(accessToken), null,
+                extractAuthorities(accessToken));
     }
 
 }
