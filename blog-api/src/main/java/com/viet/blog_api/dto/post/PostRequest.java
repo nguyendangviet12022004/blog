@@ -1,9 +1,11 @@
 package com.viet.blog_api.dto.post;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 
 public record PostRequest(
-        @NotBlank(message = "title is required") String title,
-        @NotBlank(message = "content is required") String content) {
-
+                @NotBlank(message = "title is required") String title,
+                @NotBlank(message = "content is required") String content,
+                List<String> tags) {
 }

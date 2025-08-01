@@ -1,7 +1,6 @@
 package com.viet.blog_api.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -11,23 +10,28 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Post {
+public class Tag {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String title;
-    private String content;
+
+    private String name;
 
     @CreatedDate
     private LocalDateTime createdDate;
@@ -42,13 +46,4 @@ public class Post {
     @ManyToOne
     @LastModifiedBy
     private Account lastModifiedBy;
-
-    private int viewCount;
-
-    private int likeCount;
-
-    private int shareCount;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Tag> tags;
 }
