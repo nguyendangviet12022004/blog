@@ -8,8 +8,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.viet.blog_api.constant.ExecptionCode;
 import com.viet.blog_api.util.JwtUtil;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +24,23 @@ import lombok.RequiredArgsConstructor;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+
+    private void writeErrorResponse(HttpServletResponse response, String message, ExecptionCode code)
+            throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String json = String.format("""
+                    {
+                        "message": "%s",
+                        "code": "%s",
+                        "timestamp": "%s"
+                    }
+                """, message, code, java.time.LocalDateTime.now());
+
+        response.getWriter().write(json);
+    }
 
     private String extractAccessToken(@NonNull HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -37,9 +57,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String accessToken = extractAccessToken(request);
         if (accessToken != null) {
-            Authentication authentication = jwtUtil.extractAuthentication(accessToken);
+            try {
+                Authentication authentication = jwtUtil.extractAuthentication(accessToken);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (ExpiredJwtException ex) {
+                writeErrorResponse(response, "Expired Jwt", ExecptionCode.EXPIRED_JWT);
+                return;
+            } catch (JwtException ex) {
+                writeErrorResponse(response, "Invalid Jwt", ExecptionCode.INVALID_JWT);
+                return;
+            }
         }
 
         filterChain.doFilter(request, response);
