@@ -1,0 +1,38 @@
+<nav class="navbar">
+  <div class="container-fluid d-flex justify-content-between">
+    <div class="d-flex">
+      <a class="navbar-brand">Navbar</a>
+      <ul class="navbar-nav d-flex">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page">Home</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="btn-group">
+      <button
+        type="button"
+        class="btn btn-primary dropdown-toggle"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        Account
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        @if (isAuthenticated) {
+        <li><button class="dropdown-item" type="button">Logout</button></li>
+        }@else {
+        <li>
+          <button
+            class="dropdown-item"
+            type="button"
+            [routerLink]="['auth', 'login']"
+          >
+            Login
+          </button>
+        </li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

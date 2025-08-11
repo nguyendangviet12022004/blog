@@ -1,0 +1,37 @@
+<div class="container-fluid">
+  <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="email" class="form-label">Email address</label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        [(ngModel)]="loginRequest.email"
+        required
+        email
+        #email="ngModel"
+      />
+      @if (email.invalid && (email.dirty || email.touched)) {
+      <p class="text-danger">Invalid Email</p>
+
+      }
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        name="password"
+        [(ngModel)]="loginRequest.password"
+        required
+        #password="ngModel"
+      />
+      @if (password.invalid && (password.dirty || password.touched)) {
+      <p class="text-danger">Invalid Password</p>
+      }
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
